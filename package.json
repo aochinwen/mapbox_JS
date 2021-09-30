@@ -1,0 +1,28 @@
+{
+  "name": "mapbox_js",
+  "version": "1.0.0",
+  "type":"module",
+  "description": "testing various mapbox features",
+  "main": "index.js",
+  "dependencies": {
+    "mapbox-gl": "^2.5.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aochinwen/mapbox_JS.git"
+  },
+  "keywords": [
+    "mapbox",
+    "js"
+  ],
+  "author": "chinwen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aochinwen/mapbox_JS/issues"
+  },
+  "homepage": "https://github.com/aochinwen/mapbox_JS#readme"
+}
