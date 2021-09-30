@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Taxiway Closure</title>
+        <meta name="description" content="site for changi airport taxiway closure">
+        <meta name="author" content="chinwen">
+        <!-- <link rel="stylesheet" href="css/styles.css"> -->
+        <script src='https://api.mapbox.com/mapbox-gl-js/v2.4.1/mapbox-gl.js'></script>
+        <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.min.js"></script>
+        <link href='mapbox-gl.css' rel='stylesheet' />
+        <script src='js/scripts.js'></script>
+        
+        <style>
+            body { margin: 0; padding: 0; }
+            #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        </style>
+    </head>
+    <body>
+        <nav>
+
+        </nav>
+        <style>
+            #menu {
+            position: absolute;
+            background: #efefef;
+            padding: 10px;
+            margin-left: 100px;
+            font-family: 'Open Sans', sans-serif;
+            }
+        </style>
+        <div id='map'>
+        </div>
+        
+
+        <div id="menu">
+            <input id="mapbox/satellite-v9" type="radio" name="rtoggle" value="satellite" checked="checked">
+            <!-- See a list of Mapbox-hosted public styles at -->
+            <!-- https://docs.mapbox.com/api/maps/styles/#mapbox-styles -->
+            <label for="satellite-v9">satellite</label>
+            <input id="mapbox/light-v10" type="radio" name="rtoggle" value="light">
+            <label for="light-v10">light</label>
+            <input id="mapbox/dark-v10" type="radio" name="rtoggle" value="dark">
+            <label for="dark-v10">dark</label>
+            <input id="mapbox/streets-v11" type="radio" name="rtoggle" value="streets">
+            <label for="streets-v11">streets</label>
+            <input id="ray11132002/ckocybags0c1m17k88qzwqa6e" type="radio" name="rtoggle" value="CAG">
+            <label for="CAG">CAG</label>
+        </div>
+        
+        <script>
+            mapboxgl.accessToken = 'pk.eyJ1IjoicmF5MTExMzIwMDIiLCJhIjoiY2tvY3kwb3Y5MmliZDJub24wdnpjMTB5NiJ9.kPPmudTylSbhH27w2lwsoQ';
+        const map = new mapboxgl.Map({
+        container: 'map', // container ID
+        style: 'mapbox://styles/ray11132002/ckocybags0c1m17k88qzwqa6e', // style URL
+        center: [103.99676232382323, 1.3478886553251557], // starting position [lng, lat]
+        zoom: 13 // starting zoom
+        });
+         
+        const layerList = document.getElementById('menu');
+        const inputs = layerList.getElementsByTagName('input');
+         
+        for (const input of inputs) {
+        input.onclick = (layer) => {
+        const layerId = layer.target.id;
+        map.setStyle('mapbox://styles/' + layerId);
+        };
+        }
+        </script>
+
+    </body>
+</html>
