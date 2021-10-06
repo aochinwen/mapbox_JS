@@ -8,9 +8,16 @@
         <meta name="author" content="chinwen">
         <!-- <link rel="stylesheet" href="css/styles.css"> -->
         <script src='https://api.mapbox.com/mapbox-gl-js/v2.4.1/mapbox-gl.js'></script>
-        <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.min.js"></script>
         <link href='mapbox-gl.css' rel='stylesheet' />
-        <script src='js/scripts.js'></script>
+
+        <!-- Load the `mapbox-gl-geocoder` plugin. -->
+        <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.min.js"></script>
+        <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.css" type="text/css">
+        
+        <!-- area calculation -->
+        <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+        <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.2.2/mapbox-gl-draw.js"></script>
+        <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.2.2/mapbox-gl-draw.css" type="text/css">
         
         <style>
             body { margin: 0; padding: 0; }
@@ -24,16 +31,21 @@
         <style>
             #menu {
             position: absolute;
-            background: #efefef;
+            background: rgba(255,255, 255,0.8);
             padding: 10px;
-            margin-left: 100px;
-            font-family: 'Open Sans', sans-serif;
+            margin-left: 10px;
+            margin-top: 100px;
+            font-family: sans-serif;
+            border-radius: 5px;
+            color: #246a73;
             }
         </style>
         <div id='map'>
         </div>
+
         
 
+        <!-- menu for different mapstyle -->
         <div id="menu">
             <input id="mapbox/satellite-v9" type="radio" name="rtoggle" value="satellite" checked="checked">
             <!-- See a list of Mapbox-hosted public styles at -->
@@ -48,25 +60,106 @@
             <input id="ray11132002/ckocybags0c1m17k88qzwqa6e" type="radio" name="rtoggle" value="CAG">
             <label for="CAG">CAG</label>
         </div>
+
+        <!-- area calculation -->
+        <div class="calculation-box">
+            <p>Click the map to draw a polygon.</p>
+            <div id="calculated-area"></div>
+        </div>
+        <div id="features">test this feature</div>
         
         <script>
             mapboxgl.accessToken = 'pk.eyJ1IjoicmF5MTExMzIwMDIiLCJhIjoiY2tvY3kwb3Y5MmliZDJub24wdnpjMTB5NiJ9.kPPmudTylSbhH27w2lwsoQ';
-        const map = new mapboxgl.Map({
-        container: 'map', // container ID
-        style: 'mapbox://styles/ray11132002/ckocybags0c1m17k88qzwqa6e', // style URL
-        center: [103.99676232382323, 1.3478886553251557], // starting position [lng, lat]
-        zoom: 13 // starting zoom
+            const map = new mapboxgl.Map({
+            container: 'map', // container ID
+            style: 'mapbox://styles/ray11132002/ckocybags0c1m17k88qzwqa6e', // style URL
+            center: [103.99676232382323, 1.3478886553251557], // starting position [lng, lat]
+            zoom: 13 // starting zoom
+            });
+                
+            const layerList = document.getElementById('menu');
+            const inputs = layerList.getElementsByTagName('input');
+                
+            for (const input of inputs) {
+                input.onclick = (layer) => {
+                const layerId = layer.target.id;
+                map.setStyle('mapbox://styles/' + layerId);
+                };
+            }
+            map.addControl(
+                new MapboxGeocoder({
+                accessToken: mapboxgl.accessToken,
+                mapboxgl: mapboxgl
+                })
+            );
+
+            // area calculation
+
+            const draw = new MapboxDraw({
+                displayControlsDefault: true,
+                // Select which mapbox-gl-draw control buttons to add to the map.
+                controls: {
+                polygon: true,
+                trash: true
+            },
+            // Set mapbox-gl-draw to draw by default.
+            // The user does not have to click the polygon control button first.
+            //defaultMode: 'draw_polygon'
+            });
+            map.addControl(draw);
+            
+            map.on('draw.create', updateArea);
+            map.on('draw.delete', updateArea);
+            map.on('draw.update', updateArea);
+            
+            function updateArea(e) {
+                const data = draw.getAll();
+                const answer = document.getElementById('calculated-area');
+                if (data.features.length > 0) {
+                    const area = turf.area(data);
+                    // Restrict the area to 2 decimal points.
+                    const rounded_area = Math.round(area * 100) / 100;
+                    answer.innerHTML = `<p><strong>${rounded_area}</strong></p><p>square meters</p>`;
+                } else {
+                    answer.innerHTML = '';
+                    if (e.type !== 'draw.delete')
+                    alert('Click the map to draw a polygon.');
+                }
+            }
+            
+            //gather feature data
+            map.on('click', (e) => {
+                const features = map.queryRenderedFeatures(e.point);
+                
+                // Limit the number of properties we're displaying for
+                // legibility and performance
+                const displayProperties = [
+                    //'type',
+                    'properties',
+                    //'id',
+                    //'layer',
+                    //'source',
+                    //'sourceLayer',
+                    //'state'
+                ];
+                
+                const displayFeatures = features.map((feat) => {
+                    //console.log(feat)
+                    const displayFeat = {};
+                    displayProperties.forEach((prop) => {
+                        displayFeat[prop] = feat[prop];
+                        });
+                        return Object.values(displayFeat);
+                });
+                console.log(typeof displayFeatures)
+                // Write object as string with an indent of two spaces.
+                document.getElementById('features').innerHTML = JSON.stringify(
+                displayFeatures,
+                null,
+                2
+                ); 
         });
-         
-        const layerList = document.getElementById('menu');
-        const inputs = layerList.getElementsByTagName('input');
-         
-        for (const input of inputs) {
-        input.onclick = (layer) => {
-        const layerId = layer.target.id;
-        map.setStyle('mapbox://styles/' + layerId);
-        };
-        }
+
         </script>
 
     </body>

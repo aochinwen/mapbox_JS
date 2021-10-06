@@ -1,13 +1,20 @@
+
+
 console.log("geolocation loaded")
 import mapboxgl from 'mapbox-gl';
-console.log("geolocation loaded")
+export function test(){
+    console.log(test)
+}
 mapboxgl.accessToken = 'pk.eyJ1IjoicmF5MTExMzIwMDIiLCJhIjoiY2tvY3kwb3Y5MmliZDJub24wdnpjMTB5NiJ9.kPPmudTylSbhH27w2lwsoQ';
-const map = new mapboxgl.Map({
-container: 'map', // container ID
-style: 'mapbox://styles/ray11132002/ckocybags0c1m17k88qzwqa6e', // style URL
-center: [103.99676232382323, 1.3478886553251557], // starting position [lng, lat]
-zoom: 13 // starting zoom
-});
+export function initiateMap(){
+    const map = new mapboxgl.Map({
+        container: 'map', // container ID
+        style: 'mapbox://styles/ray11132002/ckocybags0c1m17k88qzwqa6e', // style URL
+        center: [103.99676232382323, 1.3478886553251557], // starting position [lng, lat]
+        zoom: 13 // starting zoom
+        });
+}
+
     
 const layerList = document.getElementById('menu');
 const inputs = layerList.getElementsByTagName('input');
